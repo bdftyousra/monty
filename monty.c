@@ -1,82 +1,24 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "stack.h"
-#include "pint.h"
-#include "pop.h"
-
+#include "monty.h"
+global_var var_global;
 /**
- * process_bytecodes - Process the bytecodes from the file
- * @file: Pointer to the bytecode file
- * @stack: Pointer to the stack
+ * main - driver function for monty program
+ * @ac: int num of arguments
+ * @av: opcode file
+ * Return: 0
  */
-void process_bytecodes(FILE *file, Stack *stack)
+int main(int ac, char **av)
 {
-	char line[100];
-	int line_number = 1;
+	stack_t *stack;
 
-	while (fgets(line, sizeof(line), file))
+	stack = NULL;
+	if (ac != 2)
 	{
-		char *opcode = strtok(line, " \t\n");
-
-		if (opcode != NULL)
-		{
-			if (strcmp(opcode, "push") == 0)
-			{
-				char *arg = strtok(NULL, " \t\n");
-
-				if (arg == NULL)
-				{
-					printf("L%d: usage: push integer\n", line_number);
-					exit(EXIT_FAILURE);
-				}
-				int value = atoi(arg);
-
-				push(stack, value);
-			}
-			else if (strcmp(opcode, "pall") == 0)
-			{
-				pall(stack);
-			}
-			else if (strcmp(opcode, "pint") == 0)
-			{
-				pint(stack, line_number);
-			}
-			else if (strcmp(opcode, "pop") == 0)
-			{
-				pop(stack, line_number);
-			}
-		}
-		line_number++;
+		fprintf(stderr, "USAGE: monty file\n");
+		exit(EXIT_FAILURE);
 	}
-}
-/**
- * main - Entry point of the program
- * @argc : argc
- * @argv: argv
- *
- * Return: 0 on success, or EXIT_FAILURE on failure
- */
-int main(int argc, char *argv[])
-{
-	if (argc != 2)
-	{
-		fprintf(stderr, "Usage: %s <bytecode_file>\n", argv[0]);
-		return (EXIT_FAILURE);
-	}
-	Stack stack;
 
-	stack.top = 0;
-	FILE *file = fopen(argv[1], "r");
-
-	if (file == NULL)
-	{
-		fprintf(stderr, "Failed to open bytecode file!\n");
-		return (EXIT_FAILURE);
-	}
-	process_bytecodes(file, &stack);
-
-	fclose(file);
-
+	read_file(av[1], &stack);
+    /* recordar liberar memorias */
+	free_dlistint(stack);
 	return (0);
 }
